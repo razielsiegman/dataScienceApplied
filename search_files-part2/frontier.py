@@ -42,7 +42,11 @@ def remove(h):
     return s
 
 def val(s):  # returns f(x) which is path len + heuristic distance from target
-    return state.hdistance2(s)+state.path_len(s)
+    #For weighted A* search, multiply the heuristic distance by 2, as below
+    return 2*state.hdistance2(s)+state.path_len(s)
+    #return state.hdistance2(s)+state.path_len(s)
+
+
 '''
 for greedy best first search val returns hdistance
 for uniform cost val returns path len

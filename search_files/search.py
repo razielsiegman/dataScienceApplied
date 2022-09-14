@@ -19,8 +19,10 @@ def search(n):
 
 #Runs the n-puzzle 100 times, where the dimension of the puzzle is the parameter
 #prints the total number of pushes and pops, as well as the average depth
+#For a 3x3 puzzle, average depth, pushes, and pops are around 6, 1800 and 1000. respectively.
+#While depth is pretty consistent, pushes and pops have a significant variance
 def experiment(size):
-    n = 10000
+    n = 100
     avg_depth = 0
     pushes = 0
     pops = 0
@@ -34,5 +36,5 @@ def experiment(size):
     pops = pops /n
     return[avg_depth, pushes, pops]
 
-answer = experiment(2)
+answer = experiment(3)
 print(answer)

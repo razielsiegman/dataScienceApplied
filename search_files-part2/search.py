@@ -17,8 +17,13 @@ def search(n):
 
 #Runs the n-puzzle 100 times, where the dimension of the puzzle is the parameter
 #prints the total number of pushes and pops, as well as the path length
+#The following are the typical path length, push and pop values, respectively, for a 3x3 puzzle:
+#hdistance: 6, 800, 500
+#hdistance1: 6, 40, 25
+#hdistance2: 6, 25, 15
+#No discernable difference was noticed when using a weighted A* algorithm
 def experiment(size):
-    n = 100
+    n = 1000
     pushes = 0
     pops = 0
     path_length = 0
