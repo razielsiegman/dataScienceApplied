@@ -4,15 +4,9 @@ import random
 columns = [] 
 size = 4
 
-def get_queens(size):
-  columns = []
-  row = 0
-  while row < size:
-    column=random.randrange(0,size)
-    columns.append(column)
-    row+=1
-  return columns
+#UTIL METHODS
 
+#original methodw from Professor Rosenfeld below
 def place_n_queens(size):
   columns.clear()
   row = 0
@@ -20,9 +14,6 @@ def place_n_queens(size):
       column=random.randrange(0,size)
       columns.append(column)
       row+=1
-
-      
-#dfs util methods
 
 def place_in_next_row(column):
     columns.append(column)
@@ -51,7 +42,20 @@ def next_row_is_safe(column):
             return False
     return True
  
- #hill climbing util methods
+#My util methods
+
+#generate a random nxn board
+def get_queens(size):
+  columns = []
+  row = 0
+  while row < size:
+    column=random.randrange(0,size)
+    columns.append(column)
+    row+=1
+  return columns
+
+#given two queens, determine if there is a conflict
+#Note: checking rows is not necassary here, but done for completeness
 def conflict(row_a, column_a, row_b, column_b):
   if(row_a == row_b):
     return True
@@ -61,6 +65,7 @@ def conflict(row_a, column_a, row_b, column_b):
     return True
   return False
 
+#Given a board of queens, determine which queen has the most conflicts, to be moved in hill climbing method
 def highestConflict(columns): 
   highest_index = -1
   highest_count = 0
@@ -75,6 +80,8 @@ def highestConflict(columns):
             highest_index = index_i
   return highest_index, highest_count
 
+#Given a board of queens and a specific row, determine how many conflicts the queen has
+#to ultimately determine where the most conflicted queen should be moved
 def conflictCount(columns, index):
   curr = 0
   for index_i, i in enumerate(columns):
@@ -83,6 +90,7 @@ def conflictCount(columns, index):
         curr += 1
   return curr
 
+#British museum algorithm
 def british_museum(size):
   moves = 0
   iterations = 0
@@ -93,6 +101,7 @@ def british_museum(size):
     if highestConflict(columns)[1] == 0:
       return iterations, moves
 
+#DFS
 def dfs(size):
     columns.clear()
     number_of_moves = 0 
@@ -129,49 +138,56 @@ def dfs(size):
             column = 1 + prev_column 
     return number_of_iterations, number_of_moves
 
+#Hill climbing algorithm
 def hill_climbing(size):
   iterations = 1
   moves = size
   columns = get_queens(size)
   while True:
+    #Determine which queen has the most conflicts
     highest_index, highest_count = highestConflict(columns)
     new_column = -1
+    #Algorithm has finished if there are no conflicts
     if(highest_count == 0):
       break
+    #Try moving the most conflicted queen, and see if there are any better options
     for i in range(len(columns)):
       temp = columns.copy()
       temp[highest_index] = i
+      #If there is a better option for the most conflicted queen, mmove it, and increment iterations and moves
       if(conflictCount(columns, highest_index) > conflictCount(temp, highest_index)):
         columns = temp
         iterations += 1
         moves += 1
         new_column = 0
         break
+    #If no improvements can be made, peform random restart
     if(new_column == -1):
       columns = get_queens(size)
       iterations += 1
       moves += size
   return moves, iterations
 
+#Forward checking algorithm
 def forward(size):
     columns.clear()
     number_of_moves = 0 
     number_of_iterations = 0  
     row = 0
     column = 0
+    #Create a dictionary with a mapping from each queen to a list of spots where it cannot be placed
     not_available = dict.fromkeys(range(size))
+    #Initialize dictionary lists
     for k in not_available:
       not_available[k] = []
-
-    # iterate over rows of board
     while True:
-        #place queen in next row
         while column < size:
+            #If the spot to move the queen is available, then move it, and increment moves and iterations
             if column not in not_available.get(row):
                 number_of_moves += 1
                 number_of_iterations+=1
-                #place_in_next_row(column)
-                columns.append(column)
+                place_in_next_row(column)
+                #Determine all the spots where the remaining queens cannot be placed, and add them to the dictionary
                 for i in range(size):
                   for j in range(size):
                     if(conflict(row, column, i, j)):
@@ -182,12 +198,12 @@ def forward(size):
                 break
             else:
                 column += 1
-        # if I could not find an open column or if board is full
+        #If queen could not be placed
         if (column == size or row == size):
-            # if board is full, we have a solution
+            #If there is a solution
             if row == size:
                 return number_of_iterations, number_of_moves
-            # I couldn't find a solution so I now backtrack
+            #Backtrack, as well as reset the list of onflicts
             prev_column = remove_in_current_row()
             not_available = dict.fromkeys(range(size))
             for k in not_available:
@@ -200,14 +216,14 @@ def forward(size):
                       mylist.append(k)
 
 
-            if (prev_column == -1): #I backtracked past column 1
+            if (prev_column == -1):
                  return number_of_iterations, number_of_moves
-            # try previous row again
             row -= 1
-            # start checking at column = (1 + value of column in previous row)
             column = 1 + prev_column 
     return number_of_iterations, number_of_moves
 
+
+#Run British Museum Algorithm 10 times (since 100 takes quite a while) and view results
 british_iter = 0
 british_moves = 0
 british_iter_min = 1000000
@@ -235,6 +251,8 @@ print('british moves average', british_moves)
 print('british moves min', british_moves_min)
 print('british moves max', british_moves_max)
 
+
+#Run DFS 100 times and view results
 dfs_iter = 0
 dfs_moves = 0
 dfs_iter_min = 1000000
@@ -263,6 +281,7 @@ print('dfs moves min', dfs_moves_min)
 print('dfs moves max', dfs_moves_max)
 
 
+#Run Forward checking 100 times and view results
 forward_iter = 0
 forward_moves = 0
 forward_iter_min = 1000000
@@ -291,7 +310,7 @@ print('forward moves min', forward_moves_min)
 print('forward moves max', forward_moves_max)
 
 
-
+#Run hill climbing 100 times and view results
 hill_climbing_iter = 0
 hill_climbing_moves = 0
 hill_climbing_iter_min = 1000000
