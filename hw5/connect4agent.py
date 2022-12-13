@@ -83,7 +83,7 @@ def move_random(board, color):
     drop_chip(board, row, column, color)
 
 #Move the agent, by simulating 100 random games for each column, and choosing the column based off of the column with the most wins
-def move_agent(board, color):
+def MCagent(board, color):
   best_column = -1
   best_count = -1
   #For every column..
